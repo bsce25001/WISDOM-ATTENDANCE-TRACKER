@@ -54,8 +54,8 @@ export default function Dashboard() {
         setStats({
           students: Array.isArray(students) ? students.length : (students?.total || 0),
           events: Array.isArray(events) ? events.length : (events?.total || 0),
-          present: attendanceStats?.totalPresent ?? attendanceStats?.present ?? 0,
-          absent: attendanceStats?.totalAbsent ?? attendanceStats?.absent ?? 0,
+          present: attendanceStats?.overallPresent ?? attendanceStats?.totalPresent ?? attendanceStats?.present ?? 0,
+          absent: attendanceStats?.overallAbsent ?? attendanceStats?.totalAbsent ?? attendanceStats?.absent ?? 0,
         });
 
         const eventsArr = Array.isArray(events) ? events : (events?.data || []);

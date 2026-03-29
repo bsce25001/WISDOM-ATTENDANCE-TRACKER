@@ -57,8 +57,8 @@ export default function Statistics() {
   }
 
   const totalEvents = stats?.totalEvents ?? stats?.eventStats?.length ?? 0;
-  const totalPresent = stats?.totalPresent ?? stats?.present ?? 0;
-  const totalAbsent = stats?.totalAbsent ?? stats?.absent ?? 0;
+  const totalPresent = stats?.overallPresent ?? stats?.totalPresent ?? stats?.present ?? 0;
+  const totalAbsent = stats?.overallAbsent ?? stats?.totalAbsent ?? stats?.absent ?? 0;
   const totalRecords = totalPresent + totalAbsent;
   const avgPct = totalRecords > 0 ? Math.round((totalPresent / totalRecords) * 100) : 0;
 

@@ -10,12 +10,13 @@ export default function StudentDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user?._id) return;
+    const studentId = user?.studentId || user?._id;
+    if (!studentId) return;
     const fetchData = async () => {
       try {
         const [histRes, statsRes] = await Promise.all([
-          api.get(`/api/attendance/student/${user._id}`),
-          api.get(`/api/attendance/student-stats/${user._id}`).catch(() => ({ data: null })),
+          api.get(`/api/attendance/student/${studentId}`),
+          api.get(`/api/attendance/student-stats/${studentId}`).catch(() => ({ data: null })),
         ]);
         const records = Array.isArray(histRes.data) ? histRes.data : histRes.data?.records || histRes.data?.data || [];
         setHistory(records);
@@ -42,8 +43,9 @@ export default function StudentDashboard() {
   }, [user]);
 
   const handleDownloadPDF = async () => {
+    const studentId = user?.studentId || user?._id;
     try {
-      const res = await api.get(`/api/reports/student/${user._id}`, { responseType: 'blob' });
+      const res = await api.get(`/api/reports/student/${studentId}`, { responseType: 'blob' });
       const url = URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
       const link = document.createElement('a');
       link.href = url;

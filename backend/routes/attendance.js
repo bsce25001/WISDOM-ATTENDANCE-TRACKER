@@ -11,17 +11,45 @@ router.get(
   '/stats',
   protect,
   asyncHandler(async (req, res) => {
-    const [totalStudents, totalEvents, presentCount, absentCount] = await Promise.all([
+    const [totalStudents, totalEvents, presentCount, absentCount, events, students] = await Promise.all([
       Student.countDocuments(),
       Event.countDocuments(),
       Attendance.countDocuments({ status: 'present' }),
       Attendance.countDocuments({ status: 'absent' }),
+      Event.find().sort({ date: -1 }),
+      Student.find().select('name'),
     ]);
+
+    // Per-event stats
+    const eventStats = await Promise.all(
+      events.map(async (ev) => {
+        const [present, absent] = await Promise.all([
+          Attendance.countDocuments({ event: ev._id, status: 'present' }),
+          Attendance.countDocuments({ event: ev._id, status: 'absent' }),
+        ]);
+        return { eventId: ev._id, eventTitle: ev.title, date: ev.date, present, absent };
+      })
+    );
+
+    // Per-student stats
+    const studentStats = await Promise.all(
+      students.map(async (st) => {
+        const [present, absent] = await Promise.all([
+          Attendance.countDocuments({ student: st._id, status: 'present' }),
+          Attendance.countDocuments({ student: st._id, status: 'absent' }),
+        ]);
+        const total = present + absent;
+        return { studentId: st._id, name: st.name, present, absent, total };
+      })
+    );
+
     res.json({
       totalStudents,
       totalEvents,
       overallPresent: presentCount,
       overallAbsent: absentCount,
+      eventStats,
+      studentStats,
     });
   })
 );
